@@ -1,1 +1,3 @@
-# dealsrc-rightmove-scraper
+# hyperliq-loader
+Hyperliquid data loader
+https://hyperliquid.xyz/
