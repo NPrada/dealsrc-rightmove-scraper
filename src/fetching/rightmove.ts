@@ -1,9 +1,18 @@
 import axios from "axios";
 import { logger } from "../server";
 
-interface TypeAheadLocation {
+type TypeAheadLocation = {
+  displayName: string;
   locationIdentifier: string;
-}
+  normalisedSearchTerm: string;
+};
+
+type SearchLoactionResponse = {
+  key: string;
+  term: string;
+  typeAheadLocations: TypeAheadLocation[];
+  isComplete: boolean;
+};
 
 interface SearchResult {
   resultCount: string;
@@ -22,8 +31,7 @@ export async function findLocations(query: string): Promise<string[]> {
   // const url = `https://www.rightmove.co.uk/typeAhead/uknostreet/CO/RN/WA/LL/`
   const url = `https://www.rightmove.co.uk/typeAhead/uknostreet/${tokenizeQuery}/`;
 
-  console.log("url: ", url);
-  const response = await axios.get(url);
+  const response = await axios.get<SearchLoactionResponse>(url);
   const data = response.data;
   console.log(data);
   return data.typeAheadLocations.map(

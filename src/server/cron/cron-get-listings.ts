@@ -12,12 +12,12 @@ export const cronLoadData: ChronParams = {
     try {
       logger.info("booted the load data cron process...");
 
-      const cornwallId = (await findLocations('cornwall'))[0];
+      const cornwallId = (await findLocations("NW3"))[0];
       console.log(cornwallId);
       // const cornwallResults = await scrapeSearch(cornwallId);
       // console.log(JSON.stringify(cornwallResults, null, 2));
 
-      logger.info("finished loading data")
+      logger.info("finished loading data");
     } catch (error) {
       // handle any error that occurred during execution
       logger.error(error, "Error during fetch");
