@@ -1,27 +1,48 @@
 import type { Params as ChronParams } from "fastify-cron";
 import { logger } from "..";
 import { loadData } from "../..";
-import { findLocations, scrapeSearch } from "../../fetching/rightmove";
-
+import { findLocationByPostcode, scrapeSearch } from "../../fetching/rightmove";
+import { postcodeAreas } from "../../../postcodes/postcodes";
+import { deduplicateListings, parseRightMoveListing } from "../../parsing";
+import { upsertPropertyListings } from "../../persistance/fly-pg";
+import { sleep } from "../../utils/sleep";
+let isRunning = false;
 export const cronLoadData: ChronParams = {
   name: "run-load-data",
   start: true,
   runOnInit: true,
   cronTime: "0,1,5,55,59 * * * *", // every 19 min
   onTick: async () => {
-    try {
-      logger.info("booted the load data cron process...");
+    if (!isRunning) {
+      try {
+        isRunning = true;
+        logger.info("booted the load data cron process...");
 
-      const cornwallId = (await findLocations("NW3"))[0];
-      console.log(cornwallId);
-      // const cornwallResults = await scrapeSearch(cornwallId);
-      // console.log(JSON.stringify(cornwallResults, null, 2));
+        for (const [index, postcode] of postcodeAreas.entries()) {
+          const mostLikelyRegion = await findLocationByPostcode(postcode);
+          const searchResults = await scrapeSearch(mostLikelyRegion);
 
-      logger.info("finished loading data");
-    } catch (error) {
-      // handle any error that occurred during execution
-      logger.error(error, "Error during fetch");
-      // break; // break the loop if an error occurred
+          const parsedResults = searchResults.map((result) =>
+            parseRightMoveListing(result)
+          );
+
+          await upsertPropertyListings(deduplicateListings(parsedResults));
+          console.log(
+            `⤴️ scraped and upserted ${postcode} listings ${index + 1} of ${
+              postcodeAreas.length
+            }...`
+          );
+          await sleep(5000);
+        }
+
+        logger.info("finished loading data");
+      } catch (error) {
+        // handle any error that occurred during execution
+        logger.error(error, "Error during fetch");
+        // break; // break the loop if an error occurred
+      } finally {
+        isRunning = false;
+      }
     }
   },
 };
