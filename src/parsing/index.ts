@@ -20,6 +20,7 @@ export function parseRightMoveListing(input: PropertyListing, postcodeArea: stri
     summary: input.summary,
     display_address: input.displayAddress,
     postcode_area: postcodeArea,
+    property_url: input.propertyUrl,
     country_code: input.countryCode,
     latitude: input.location.latitude,
     longitude: input.location.longitude,

@@ -20,7 +20,7 @@ export async function upsertPropertyListings(
 
   const baseQuery = `
     INSERT INTO rightmove_property_listings_raw (
-      id, bedrooms, bathrooms, number_of_images, summary, display_address, postcode_area,
+      id, bedrooms, bathrooms, number_of_images, summary, display_address, postcode_area, property_url,
       country_code, latitude, longitude, property_images, property_sub_type,
       listing_update_reason, listing_update_date, price_amount, price_frequency,
       currency_code, display_price, display_price_qualifier, branch_id,
@@ -43,6 +43,7 @@ export async function upsertPropertyListings(
       number_of_images = EXCLUDED.number_of_images,
       summary = EXCLUDED.summary,
       display_address = EXCLUDED.display_address,
+      property_url = EXCLUDED.property_url,
       postcode_area = EXCLUDED.postcode_area,
       country_code = EXCLUDED.country_code,
       latitude = EXCLUDED.latitude,
@@ -87,6 +88,7 @@ export async function upsertPropertyListings(
     obj.summary,
     obj.display_address,
     obj.postcode_area,
+    obj.property_url
     obj.country_code,
     obj.latitude,
     obj.longitude,

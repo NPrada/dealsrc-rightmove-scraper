@@ -8,6 +8,7 @@ create table public.rightmove_property_listings_raw
     summary                        text,
     display_address                varchar(255),
     postcode_area                  varchar(255),
+    property_url                   text,  
     country_code                   char(2),
     latitude                       numeric(10, 6),
     longitude                      numeric(10, 6),
