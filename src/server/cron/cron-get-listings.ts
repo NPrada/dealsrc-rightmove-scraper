@@ -21,9 +21,9 @@ export const cronLoadData: ChronParams = {
         for (const [index, postcode] of postcodeAreas.entries()) {
           const mostLikelyRegion = await findLocationByPostcode(postcode);
           const searchResults = await scrapeSearch(mostLikelyRegion);
-
+          console.log("searchResults", searchResults[0])
           const parsedResults = searchResults.map((result) =>
-            parseRightMoveListing(result)
+            parseRightMoveListing(result, postcode)
           );
 
           await upsertPropertyListings(deduplicateListings(parsedResults));

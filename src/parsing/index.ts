@@ -11,7 +11,7 @@ export function deduplicateListings(listings: ReturnType<typeof parseRightMoveLi
   return Array.from(uniqueListings.values());
 }
 
-export function parseRightMoveListing(input: PropertyListing) {
+export function parseRightMoveListing(input: PropertyListing, postcodeArea: string) {
   return {
     id: input.id,
     bedrooms: input.bedrooms,
@@ -19,6 +19,7 @@ export function parseRightMoveListing(input: PropertyListing) {
     number_of_images: input.numberOfImages,
     summary: input.summary,
     display_address: input.displayAddress,
+    postcode_area: postcodeArea,
     country_code: input.countryCode,
     latitude: input.location.latitude,
     longitude: input.location.longitude,
