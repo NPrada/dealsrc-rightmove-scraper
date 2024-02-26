@@ -11,7 +11,7 @@ interface ProcessbatchParams {
   postcode: string;
 }
 
-class Loader {
+export class Loader {
   entity: AbstractEntity;
   target: AbstractTarget;
   q: queueAsPromised<Parameters<typeof this.processNewBatch>[0]>;
@@ -32,14 +32,13 @@ class Loader {
   }
 
   private async processNewBatch({ newData, postcode }: ProcessbatchParams) {
-    const [deliveryId, nextEventId] = await Promise.all([
+    const [deliveryId, nextEventId, prevData] = await Promise.all([
       this.target.get_next_delivery_id(),
       this.target.get_next_event_id(),
+      this.target.get_current_state({
+        postcode_area: postcode,
+      }),
     ]);
-
-    const prevData = await this.target.get_current_state({
-      postcode_area: postcode,
-    });
 
     const prev = prevData.map((data) =>
       State.init_source_data({
@@ -49,6 +48,7 @@ class Loader {
         entity: this.entity,
       })
     );
+
     const curr = newData.map((data) =>
       State.init_target_data({
         data,

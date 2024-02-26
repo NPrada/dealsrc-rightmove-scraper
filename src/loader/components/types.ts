@@ -1,3 +1,4 @@
+import { queueAsPromised } from "fastq";
 import { AbstractEntity } from "./entity";
 import { EventLogItem } from "./event-log";
 
@@ -26,4 +27,11 @@ export abstract class AbstractTarget {
     events: Events;
     start_time: number;
   }): Promise<void>;
+}
+
+export abstract class LoaderAbstract {
+  abstract entity: AbstractEntity;
+  abstract target: AbstractTarget;
+  abstract q: queueAsPromised<any>;
+  abstract process(params: any): Promise<void>;
 }

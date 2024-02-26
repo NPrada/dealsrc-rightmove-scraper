@@ -18,7 +18,7 @@ export const cronLoadData: ChronParams = {
       try {
         isRunning = true;
         logger.info("booted the load data cron process...");
-
+        // const propertyListings = new Loader
         for (const [index, postcode] of postcodeAreas.entries()) {
           const mostLikelyRegion = await findLocationByPostcode(postcode);
           const searchResults = await scrapeSearch(mostLikelyRegion);
