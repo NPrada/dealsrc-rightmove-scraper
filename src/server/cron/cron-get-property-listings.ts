@@ -6,9 +6,14 @@ import { postcodeAreas } from "../../../postcodes/postcodes";
 import { deduplicateListings, parseRightMoveListing } from "../../parsing";
 import { upsertPropertyListings } from "../../persistance/fly-pg";
 import { sleep } from "../../utils/sleep";
+import { Loader } from "../../loader";
+import { propertyListingEntity } from "../../loader/entities";
+import { PGTarget } from "../../loader/targets/pg-target";
+import { env } from "../../env";
+import { retry } from "../../utils/retry";
 
 let isRunning = false;
-export const cronLoadData: ChronParams = {
+export const cronLoadPropertyData: ChronParams = {
   name: "run-load-data",
   start: true,
   runOnInit: true,
@@ -18,25 +23,47 @@ export const cronLoadData: ChronParams = {
       try {
         isRunning = true;
         logger.info("booted the load data cron process...");
-        // const propertyListings = new Loader
-        for (const [index, postcode] of postcodeAreas.entries()) {
-          const mostLikelyRegion = await findLocationByPostcode(postcode);
-          const searchResults = await scrapeSearch(mostLikelyRegion);
-          console.log("searchResults", searchResults[0]);
-          const parsedResults = searchResults.map((result) =>
-            parseRightMoveListing(result, postcode)
-          );
 
-          await upsertPropertyListings(
-            deduplicateListings(parsedResults),
-            "BUY"
-          );
-          console.log(
-            `⤴️ scraped and upserted ${postcode} listings ${index + 1} of ${
-              postcodeAreas.length
-            }...`
-          );
-          await sleep(5000);
+        const target = new PGTarget(propertyListingEntity, {
+          connectionString: env.DATABASE_URL,
+          max: 20,
+        });
+
+        const propertyLoader = new Loader({
+          entity: propertyListingEntity,
+          target: target,
+        });
+        for (const [index, postcode] of postcodeAreas.entries()) {
+          await sleep(1000);
+          try {
+            await retry(
+              async () => {
+                const mostLikelyRegion = await findLocationByPostcode(postcode);
+                const searchResults = await scrapeSearch(
+                  mostLikelyRegion,
+                  "BUY"
+                );
+
+                const parsedResults = searchResults.map((result) =>
+                  parseRightMoveListing(result, postcode)
+                );
+
+                await propertyLoader.process({
+                  newData: parsedResults,
+                  postcode: postcode,
+                });
+                console.log(
+                  `⤴️ scraped and upserted ${postcode} listings ${
+                    index + 1
+                  } of ${postcodeAreas.length}...`
+                );
+              },
+              3,
+              1000
+            );
+          } catch (error) {
+            logger.error(error, `Error during ${postcode} scrape`);
+          }
         }
 
         logger.info("finished loading data");
@@ -50,7 +77,6 @@ export const cronLoadData: ChronParams = {
     }
   },
 };
-
 
 // try {
 //   isRunning = true;

@@ -31,25 +31,24 @@ export const cronLoadRentalListingsData: ChronParams = {
                 const parsedResults = searchResults.map((result) =>
                   parseRightMoveListing(result, postcode)
                 );
-  
+
                 await upsertPropertyListings(
                   deduplicateListings(parsedResults),
                   "RENT"
                 );
                 console.log(
-                  `⤴️ scraped and upserted ${postcode} listings ${index + 1} of ${
-                    postcodeAreas.length
-                  }...`
+                  `⤴️ scraped and upserted ${postcode} listings ${
+                    index + 1
+                  } of ${postcodeAreas.length}...`
                 );
                 await sleep(1000);
               },
               3,
               1000 * 10
             );
-          }catch (error) {
+          } catch (error) {
             logger.error(error, `Error during ${postcode} scrape`);
           }
-          
         }
 
         logger.info("finished loading data");

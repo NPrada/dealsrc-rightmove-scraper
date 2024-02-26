@@ -46,11 +46,11 @@ export class State {
     }
 
     if (this.data) {
-      let idVal = ''
-      this.entity.keyFields.forEach(key => {
-        idVal += this.data[key] + '-'
-      })
-      return idVal
+      let idVal = "";
+      this.entity.keyFields.forEach((key) => {
+        idVal += this.data[key] + "-";
+      });
+      return idVal;
     }
 
     throw new Error(
@@ -105,7 +105,7 @@ export class State {
       event_id,
       delivery_id,
       keyVal,
-      entity: entity;
+      entity: entity,
     });
   }
 }

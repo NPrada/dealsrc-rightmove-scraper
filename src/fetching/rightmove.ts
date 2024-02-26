@@ -32,7 +32,7 @@ export const findLocationByPostcode = async (
     const response = await fetch(
       `https://www.rightmove.co.uk/house-prices/${postcode}.html`
     );
-    console.log('response', response)
+
     const htmlText = await response.text();
     const $ = cheerio.load(htmlText);
     //@ts-ignore

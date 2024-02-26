@@ -29,7 +29,7 @@ export class PGTarget extends AbstractTarget {
   }): Promise<any[]> {
     const { filters = [] } = params;
     try {
-      let query = `SELECT * FROM mastercollector.${this.entityName}`;
+      let query = `SELECT * FROM public.${this.entityName}`;
       const values: string[] = [];
       let whereClauses: string[] = [];
 
@@ -57,7 +57,7 @@ export class PGTarget extends AbstractTarget {
   async get_last_event_id(): Promise<number> {
     try {
       const res = await this.pool.query(
-        `SELECT * FROM mastercollector.${this.entityName}_event_log ORDER BY event_id DESC LIMIT 1`
+        `SELECT * FROM public.${this.entityName}_event_log ORDER BY event_id DESC LIMIT 1`
       );
       return Number(res.rows[0]?.event_id) || 0;
     } catch (error) {
@@ -68,7 +68,7 @@ export class PGTarget extends AbstractTarget {
   async get_last_delivery_id(): Promise<number> {
     try {
       const res = await this.pool.query(
-        `SELECT * FROM mastercollector.${this.entityName}_event_log ORDER BY delivery_id DESC LIMIT 1`
+        `SELECT * FROM public.${this.entityName}_event_log ORDER BY delivery_id DESC LIMIT 1`
       );
       return Number(res.rows[0]?.delivery_id) || 0;
     } catch (error) {
@@ -79,7 +79,7 @@ export class PGTarget extends AbstractTarget {
   async get_next_event_id(): Promise<number> {
     try {
       const res = await this.pool.query(
-        `SELECT * FROM mastercollector.${this.entityName}_event_log ORDER BY event_id DESC LIMIT 1`
+        `SELECT * FROM public.${this.entityName}_event_log ORDER BY event_id DESC LIMIT 1`
       );
       return (Number(res.rows[0]?.event_id) || 0) + 1;
     } catch (error) {
@@ -90,7 +90,7 @@ export class PGTarget extends AbstractTarget {
   async get_next_delivery_id(): Promise<number> {
     try {
       const res = await this.pool.query(
-        `SELECT * FROM mastercollector.${this.entityName}_event_log ORDER BY delivery_id DESC LIMIT 1`
+        `SELECT * FROM public.${this.entityName}_event_log ORDER BY delivery_id DESC LIMIT 1`
       );
       return (Number(res.rows[0]?.delivery_id) || 0) + 1;
     } catch (error) {
@@ -117,7 +117,7 @@ class PGDeliveryPersist {
   entityName: string;
   entity: AbstractEntity;
   private client: PoolClient;
-  constructor(client: PoolClient,   entity: AbstractEntity) {
+  constructor(client: PoolClient, entity: AbstractEntity) {
     this.client = client;
     this.entityName = entity.name;
     this.entity = entity;
@@ -158,7 +158,7 @@ class PGDeliveryPersist {
       if (hasNoEvents) {
         console.log(`no events to persist!`);
       } else {
-        console.log(`persisted delivery! (${delivery_id})`);
+        console.log(`✅persisted delivery! (${delivery_id})`);
       }
 
       await this.client.query("COMMIT");
@@ -196,7 +196,7 @@ class PGDeliveryPersist {
     )
       .map((el) => `$${el}`)
       .join(", ");
-    const queryEventLog = `INSERT INTO mastercollector.${this.entityName}_event_log (${tableColumns}) VALUES(${tableInserts})`;
+    const queryEventLog = `INSERT INTO public.${this.entityName}_event_log (${tableColumns}) VALUES(${tableInserts})`;
 
     await this.client.query(queryEventLog, [
       delivery_id,
@@ -228,7 +228,7 @@ class PGDeliveryPersist {
         //WRITE TO TABLE
         const currData = event.curr.data;
         const queryDataTable = `
-          INSERT INTO mastercollector.${this.entityName} 
+          INSERT INTO public.${this.entityName} 
           (${this.entity.fields.join(",")}, hash, event_id, delivery_id ) 
           VALUES(${createArrayThroughN(this.entity.fields.length + 3)
             .map((el) => `$${el}`)
@@ -246,7 +246,7 @@ class PGDeliveryPersist {
         //WRITE TO TABLE
         const currData = event.curr.data;
         const queryDataTable = `
-            INSERT INTO mastercollector.${this.entityName} 
+            INSERT INTO public.${this.entityName} 
             (${this.entity.fields.join(",")}, hash, event_id, delivery_id) 
             VALUES(${createArrayThroughN(this.entity.fields.length + 3)
               .map((el) => `$${el}`)
@@ -276,7 +276,7 @@ class PGDeliveryPersist {
           .join(" AND ");
 
         const queryDataTable = `
-            DELETE FROM mastercollector.${this.entityName} WHERE ${buildtWhereClauses}
+            DELETE FROM public.${this.entityName} WHERE ${buildtWhereClauses}
           `;
 
         await this.client.query(queryDataTable, [
@@ -296,5 +296,3 @@ class PGDeliveryPersist {
 
 const createArrayThroughN = (n: number): number[] =>
   Array.from({ length: n }, (_, i) => i + 1);
-
-export const target = new PGTarget("stackr_users");

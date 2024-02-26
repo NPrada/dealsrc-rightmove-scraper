@@ -1,5 +1,4 @@
-import { PGTarget } from "../../clients/target";
-import { AbstractEntity, Entity } from "./entity";
+import { AbstractEntity } from "./entity";
 import { EventLogItem, KeyVal, State } from "./event-log";
 import { infiniteSequence } from "./event-log-id-generator";
 import { Events } from "./types";

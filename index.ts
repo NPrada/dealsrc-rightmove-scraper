@@ -1,12 +1,12 @@
 import { logger, server } from "./src/server";
 import fastifyCron from "fastify-cron";
-import { cronLoadData } from "./src/server/cron/cron-get-listings";
+import { cronLoadPropertyData } from "./src/server/cron/cron-get-property-listings";
 import { cronLoadRentalListingsData } from "./src/server/cron/cron-get-rental-listings";
 
 server.register(fastifyCron, {
   jobs: [
-    cronLoadData,
-    cronLoadRentalListingsData,
+    cronLoadPropertyData,
+    // cronLoadRentalListingsData,
   ],
 });
 

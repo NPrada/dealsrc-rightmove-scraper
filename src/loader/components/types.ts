@@ -1,4 +1,4 @@
-import { queueAsPromised } from "fastq";
+import fastq, { queueAsPromised } from "fastq";
 import { AbstractEntity } from "./entity";
 import { EventLogItem } from "./event-log";
 

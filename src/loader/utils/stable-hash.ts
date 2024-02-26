@@ -10,3 +10,4 @@ export const objectToHashStable = (obj: object): string => {
 
   return hash;
 };
+stringify

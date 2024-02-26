@@ -46,12 +46,16 @@ class PropertyListingEntity extends AbstractEntity {
     "property_type_full_description",
   ] as const;
 
-  constructor(name: "rightmove_property_listing" |"rightmove_rental_listing") {
+  constructor(name: "rightmove_property_listing" | "rightmove_rental_listing") {
     super();
     this.name = name;
     this.keyFields = ["id"];
   }
 }
 
-export const propertyListingEntity = new PropertyListingEntity("rightmove_property_listing");
-export const rentalListingEntity = new PropertyListingEntity("rightmove_rental_listing");
+export const propertyListingEntity = new PropertyListingEntity(
+  "rightmove_property_listing"
+);
+export const rentalListingEntity = new PropertyListingEntity(
+  "rightmove_rental_listing"
+);

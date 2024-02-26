@@ -1,4 +1,4 @@
-create table public.rightmove_property_listings_raw
+create table public.rightmove_property_listing_raw
 (
     id                             bigint not null
         primary key,

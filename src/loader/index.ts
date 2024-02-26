@@ -1,7 +1,7 @@
 import { computeEvents } from "./components";
 import { AbstractEntity } from "./components/entity";
 import { State } from "./components/event-log";
-import { AbstractTarget } from "./components/types";
+import { AbstractTarget, LoaderAbstract } from "./components/types";
 
 import * as fastq from "fastq";
 import type { queueAsPromised } from "fastq";
@@ -11,7 +11,7 @@ interface ProcessbatchParams {
   postcode: string;
 }
 
-export class Loader {
+export class Loader implements LoaderAbstract {
   entity: AbstractEntity;
   target: AbstractTarget;
   q: queueAsPromised<Parameters<typeof this.processNewBatch>[0]>;
@@ -24,6 +24,8 @@ export class Loader {
   }) {
     this.entity = entity;
     this.target = target;
+
+    this.processNewBatch = this.processNewBatch.bind(this);
     this.q = fastq.promise(this.processNewBatch, 1);
   }
 
@@ -31,7 +33,7 @@ export class Loader {
     return await this.q.push(params);
   }
 
-  private async processNewBatch({ newData, postcode }: ProcessbatchParams) {
+  async processNewBatch({ newData, postcode }: ProcessbatchParams) {
     const [deliveryId, nextEventId, prevData] = await Promise.all([
       this.target.get_next_delivery_id(),
       this.target.get_next_event_id(),
