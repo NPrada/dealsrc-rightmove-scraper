@@ -1,7 +1,6 @@
-create table public.rightmove_property_listings_raw
+create table public.rightmove_rental_listings_raw
 (
-    id                             bigint not null
-        primary key,
+    id                             bigint not null primary key,
     bedrooms                       integer,
     bathrooms                      integer,
     number_of_images               integer,

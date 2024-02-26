@@ -32,6 +32,7 @@ export const findLocationByPostcode = async (
     const response = await fetch(
       `https://www.rightmove.co.uk/house-prices/${postcode}.html`
     );
+    console.log('response', response)
     const htmlText = await response.text();
     const $ = cheerio.load(htmlText);
     //@ts-ignore
@@ -58,14 +59,15 @@ export const findLocationByPostcode = async (
 };
 
 export async function scrapeSearch(
-  locationId: string
+  locationId: string,
+  listingType: "BUY" | "RENT" = "BUY"
 ): Promise<PropertyListing[]> {
   const RESULTS_PER_PAGE = 24;
 
   const makeUrl = (offset: number): string => {
     const params = new URLSearchParams({
       areaSizeUnit: "sqft",
-      channel: "BUY",
+      channel: listingType,
       currencyCode: "GBP",
       includeSSTC: "false",
       index: offset.toString(),

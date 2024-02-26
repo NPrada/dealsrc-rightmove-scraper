@@ -1,9 +1,13 @@
 import { logger, server } from "./src/server";
 import fastifyCron from "fastify-cron";
 import { cronLoadData } from "./src/server/cron/cron-get-listings";
+import { cronLoadRentalListingsData } from "./src/server/cron/cron-get-rental-listings";
 
 server.register(fastifyCron, {
-  jobs: [cronLoadData],
+  jobs: [
+    cronLoadData,
+    cronLoadRentalListingsData,
+  ],
 });
 
 server.get("/health", (request, reply) => {
